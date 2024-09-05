@@ -124,3 +124,8 @@ body * {
 #videoPlayer {
   width: 40%;
 }
+
+.vl-info p {
+  display: flex;
+  gap: 20px;
+}

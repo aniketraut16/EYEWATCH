@@ -1,10 +1,64 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import AudioVisualizer from "../Utils/AudioVisualizer";
+
+// CustomAudioVisualizer component to visualize the audio stream
+const CustomAudioVisualizer = ({ analyser }) => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    if (analyser && canvasRef.current) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
+      analyser.fftSize = 2048;
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+
+      const draw = () => {
+        analyser.getByteTimeDomainData(dataArray);
+        ctx.fillStyle = "rgb(200, 200, 200)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "rgb(0, 0, 0)";
+        ctx.beginPath();
+
+        const sliceWidth = (canvas.width * 1.0) / bufferLength;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+          const v = dataArray[i] / 128.0;
+          const y = (v * canvas.height) / 2;
+
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+
+          x += sliceWidth;
+        }
+
+        ctx.lineTo(canvas.width, canvas.height / 2);
+        ctx.stroke();
+        requestAnimationFrame(draw);
+      };
+
+      draw();
+    }
+  }, [analyser]);
+
+  return <canvas ref={canvasRef} width="400" height="100" />;
+};
 
 function OneAlert() {
-  const [position, setPosition] = useState([51.5074, -0.1278]);
+  const [audioContext, setAudioContext] = useState(null);
+  const [analyser, setAnalyser] = useState(null);
+  const audioRef = useRef(null);
+  const sourceRef = useRef(null); // New reference to store MediaElementSourceNode
+  const [position, setPosition] = useState([51.5074, 34.1278]);
+
+  // Dummy data for the alert
   const [oneAlert, setOneAlert] = useState({
     device_id: "DEV-2345",
     user_info: {
@@ -20,7 +74,7 @@ function OneAlert() {
       detection_time: "2024-09-02T22:15:00Z",
       location: {
         latitude: 51.5074,
-        longitude: -0.1278,
+        longitude: 34.1278,
         address: "Trafalgar Square, London, UK",
       },
       incident_type: "Lone Woman Detected at Night",
@@ -28,10 +82,10 @@ function OneAlert() {
     },
     live_feed: {
       video_stream_url: "/public/videos/5295_New York_NYC_1280x720.mp4",
-      audio_stream_url: "/public/audios/CantinaBand60.wav",
+      audio_stream_url: "/audios/CantinaBand60.wav", // Ensure this file is located correctly
       current_location: {
         latitude: 51.5074,
-        longitude: -0.1278,
+        longitude: 34.1278,
         accuracy: "5m",
       },
       status: "Active",
@@ -61,6 +115,27 @@ function OneAlert() {
       ],
     },
   });
+
+  useEffect(() => {
+    if (audioRef.current) {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+      // If sourceRef is null, create a new MediaElementSourceNode
+      if (!sourceRef.current) {
+        const analyserNode = audioCtx.createAnalyser();
+        const sourceNode = audioCtx.createMediaElementSource(audioRef.current);
+
+        sourceNode.connect(analyserNode);
+        analyserNode.connect(audioCtx.destination);
+
+        setAudioContext(audioCtx);
+        setAnalyser(analyserNode);
+
+        // Store the sourceNode in sourceRef to avoid re-creating it
+        sourceRef.current = sourceNode;
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -95,9 +170,9 @@ function OneAlert() {
       </section>
       <section id="AlertInfo">
         <p>Alert Information</p>
-        <h3> Incident Type : {oneAlert.incident_details.incident_type}</h3>
-        <h3> Detection Time : {oneAlert.incident_details.detection_time}</h3>
-        <h3> Risk Level : {oneAlert.incident_details.risk_level}</h3>
+        <h3>Incident Type : {oneAlert.incident_details.incident_type}</h3>
+        <h3>Detection Time : {oneAlert.incident_details.detection_time}</h3>
+        <h3>Risk Level : {oneAlert.incident_details.risk_level}</h3>
       </section>
 
       <section id="LocationInfo">
@@ -123,15 +198,16 @@ function OneAlert() {
         </div>
         <div className="ll-info">
           <h2>Detected Location</h2>
-          <p>Latittude:{oneAlert.incident_details.location.latitude}</p>
-          <p>Longitude:{oneAlert.incident_details.location.longitude}</p>
-          <p>Address:{oneAlert.incident_details.location.address}</p>
+          <p>Latitude: {oneAlert.incident_details.location.latitude}</p>
+          <p>Longitude: {oneAlert.incident_details.location.longitude}</p>
+          <p>Address: {oneAlert.incident_details.location.address}</p>
           <h2>Current Location</h2>
-          <p>Latittude:{oneAlert.live_feed.current_location.latitude}</p>
-          <p>Longitude:{oneAlert.live_feed.current_location.longitude}</p>
+          <p>Latitude: {position[0]}</p>
+          <p>Longitude: {position[1]}</p>
           <p>Address: {oneAlert.live_feed.current_location.address}</p>
         </div>
       </section>
+
       <section id="VideoInfo">
         <video id="videoPlayer" autoPlay loop muted playsInline controls>
           <source
@@ -140,24 +216,52 @@ function OneAlert() {
           />
           Your browser does not support the video tag.
         </video>
-
         <div className="vl-info">
           <h2>Person Detected</h2>
           <p>
             <span>
-              Male : {oneAlert.additional_info.gender_distribution.male}
+              Male: {oneAlert.additional_info.gender_distribution.male}
             </span>
             <span>
-              Female : {oneAlert.additional_info.gender_distribution.female}
+              Female: {oneAlert.additional_info.gender_distribution.female}
             </span>
           </p>
           <h2>Surrounding Detected</h2>
-          <p>Emotion Detectes: {oneAlert.additional_info.emotion_detected}</p>
+          <p>Emotion Detected: {oneAlert.additional_info.emotion_detected}</p>
           <p>Gait Analysis: {oneAlert.additional_info.gait_analysis}</p>
-          <p>Object Detected: {oneAlert.additional_info.object_detection}</p>
+          <p>Object Detection: {oneAlert.additional_info.object_detection}</p>
         </div>
       </section>
-      <section id="AudioInfo"></section>
+
+      <section id="AudioInfo">
+        <audio
+          ref={audioRef}
+          src={oneAlert.live_feed.audio_stream_url}
+          controls
+          autoPlay
+          loop
+          muted
+        />
+        {analyser && <CustomAudioVisualizer analyser={analyser} />}
+        <h2>Audio Analysis</h2>
+        <p>Audio Detected: {oneAlert.additional_info.audio_analysis}</p>
+      </section>
+
+      <section id="PreviousIncidentsInfo">
+        <h2>Previous Incidents Nearby</h2>
+        <ul>
+          {oneAlert.additional_info.previous_incidents_nearby.map(
+            (incident, index) => (
+              <li key={index}>
+                <h3>Incident ID: {incident.incident_id}</h3>
+                <p>Detection Time: {incident.detection_time}</p>
+                <p>Incident Type: {incident.incident_type}</p>
+                <p>Risk Level: {incident.risk_level}</p>
+              </li>
+            )
+          )}
+        </ul>
+      </section>
     </div>
   );
 }
