@@ -81,7 +81,7 @@ function OneAlert() {
       risk_level: "High",
     },
     live_feed: {
-      video_stream_url: "/public/videos/5295_New York_NYC_1280x720.mp4",
+      video_stream_url: "/videos/5295_New York_NYC_1280x720.mp4",
       audio_stream_url: "/audios/CantinaBand60.wav", // Ensure this file is located correctly
       current_location: {
         latitude: 51.5074,
