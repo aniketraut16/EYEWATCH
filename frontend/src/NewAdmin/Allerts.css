@@ -1,0 +1,8 @@
+.admin-new-nav * {
+  height: fit-content;
+}
+.altert-category {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
