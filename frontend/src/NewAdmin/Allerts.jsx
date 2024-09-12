@@ -1,26 +1,126 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Allerts.css";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Allerts() {
   const [selectedAlert, setSelectedAlert] = useState("");
   const [altertCategory, setaltertCategory] = useState("system");
+  const [systemAlertCount, setSystemAlertCount] = useState(0);
+  const [userAlertCount, setUserAlertCount] = useState(0);
   const navigate = useNavigate();
-  const alertsData = [
-    {
-      date: "Jan 24, 2024",
-      key: "Primary key",
-      location: "Mxxxx xxxxxL, 789 Oak Ave",
-      time: "1:45 PM",
-      details:
-        "Suspicious activity near Mxxxx xxxxxL, 789 Oak Ave, at 1:45 PM.",
-    },
-    // Add more alerts data as needed
-  ];
 
+  // Updated system and user alerts
+  const alertsData = {
+    systemAlerts: [
+      {
+        date: "Jan 24, 2024",
+        location: "Near Central Park, 789 Oak Ave",
+        time: "1:45 PM",
+        details:
+          "A woman reported being followed near Central Park, 789 Oak Ave.",
+      },
+      {
+        date: "Feb 10, 2024",
+        location: "Library, 345 Maple St",
+        time: "3:15 PM",
+        details:
+          "A woman reported feeling unsafe due to suspicious behavior at Library, 345 Maple St.",
+      },
+      {
+        date: "Mar 05, 2024",
+        location: "Gym, 678 Pine St",
+        time: "6:30 PM",
+        details:
+          "A woman was approached by an unknown individual near the Gym, 678 Pine St.",
+      },
+      {
+        date: "Apr 22, 2024",
+        location: "Parking Lot B, 123 Oak Ave",
+        time: "9:00 AM",
+        details:
+          "A woman noticed someone loitering near her car in Parking Lot B, 123 Oak Ave.",
+      },
+      {
+        date: "May 17, 2024",
+        location: "Building C, 789 Elm St",
+        time: "11:00 PM",
+        details:
+          "A woman called for help after being harassed at Building C, 789 Elm St.",
+      },
+    ],
+    userAlerts: [
+      {
+        name: "Jane Doe",
+        age: 29,
+        gender: "Female",
+        userId: "U123456",
+        riskLevel: "High",
+      },
+      {
+        name: "John Smith",
+        age: 35,
+        gender: "Male",
+        userId: "U654321",
+        riskLevel: "Medium",
+      },
+      {
+        name: "Alice Johnson",
+        age: 27,
+        gender: "Female",
+        userId: "U789012",
+        riskLevel: "Low",
+      },
+      {
+        name: "Bob Williams",
+        age: 40,
+        gender: "Male",
+        userId: "U345678",
+        riskLevel: "Critical",
+      },
+      {
+        name: "Emily Davis",
+        age: 23,
+        gender: "Female",
+        userId: "U987654",
+        riskLevel: "Moderate",
+      },
+    ],
+  };
+
+  // Handling the selection change from the dropdown
   const handleSelectChange = (event) => {
     setSelectedAlert(event.target.value);
   };
+
+  // Track keyboard events
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "U") {
+        setUserAlertCount((prevCount) =>
+          prevCount < alertsData.userAlerts.length ? prevCount + 1 : prevCount
+        );
+        toast.warn("There is one User Alert have a look!!");
+      } else if (event.shiftKey && event.key === "S") {
+        setSystemAlertCount((prevCount) =>
+          prevCount < alertsData.systemAlerts.length ? prevCount + 1 : prevCount
+        );
+        toast.warn("There is one System Alert have a look!!");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [alertsData.systemAlerts.length, alertsData.userAlerts.length]);
+
+  // Display only the number of alerts according to the counter
+  const selectedAlerts =
+    altertCategory === "system"
+      ? alertsData.systemAlerts.slice(0, systemAlertCount)
+      : alertsData.userAlerts.slice(0, userAlertCount);
 
   return (
     <div style={{ padding: "20px" }}>
@@ -72,7 +172,7 @@ function Allerts() {
           }}
         >
           <option value="" disabled>
-            select system alerts and SOSs
+            Select system alerts and SOSs
           </option>
           <option value="Suspicious Activity Detected">
             Suspicious Activity Detected
@@ -97,8 +197,8 @@ function Allerts() {
         </select>
       </div>
 
+      {/* Alert Category Selection */}
       <div className="altert-category">
-        {/* System Alerts */}
         <h2
           onClick={() => {
             setaltertCategory("system");
@@ -106,9 +206,10 @@ function Allerts() {
           style={{
             fontWeight: "bold",
             textDecoration: altertCategory === "system" ? "underline" : "none",
+            cursor: "pointer",
           }}
         >
-          System Alerts
+          System Alerts ({systemAlertCount})
         </h2>
         <h2
           onClick={() => {
@@ -117,11 +218,14 @@ function Allerts() {
           style={{
             fontWeight: "bold",
             textDecoration: altertCategory === "user" ? "underline" : "none",
+            cursor: "pointer",
           }}
         >
-          User Alerts
+          User Alerts ({userAlertCount})
         </h2>
       </div>
+
+      {/* Display Alerts */}
       <div
         style={{
           display: "grid",
@@ -130,7 +234,7 @@ function Allerts() {
           marginTop: "20px",
         }}
       >
-        {alertsData.map((alert, index) => (
+        {selectedAlerts.map((alert, index) => (
           <div
             key={index}
             onClick={() => {
@@ -142,17 +246,35 @@ function Allerts() {
               padding: "15px",
               textAlign: "center",
               backgroundColor: "#f9fafb",
+              cursor: "pointer",
             }}
+            className="oneoone-alerts"
           >
-            <img
-              src="https://via.placeholder.com/150"
-              alt="Alert icon"
-              style={{ marginBottom: "10px" }}
-            />
-            <p>{alert.date}</p>
-            <p>[{alert.key}]</p>
-            <p>[Location of alert]</p>
-            <p>"{alert.details}"</p>
+            {altertCategory === "system" ? (
+              <>
+                <img
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNJMPKRdFu_9C2Jzefo5v-YIVPjyBsUht1QA&s"
+                  alt="Alert icon"
+                  style={{ marginBottom: "10px" }}
+                />
+                <p>{alert.date}</p>
+                <p>{alert.location}</p>
+                <p>{alert.details}</p>
+              </>
+            ) : (
+              <>
+                <img
+                  src="https://cdn.vectorstock.com/i/500p/04/37/sos-icon-emergency-alarm-button-sign-symbol-vector-26830437.jpg"
+                  alt="Alert icon"
+                  style={{ marginBottom: "10px" }}
+                />
+                <p>Name: {alert.name}</p>
+                <p>Age: {alert.age}</p>
+                <p>Gender: {alert.gender}</p>
+                <p>User Id: {alert.userId}</p>
+                <p>Risk Level: {alert.riskLevel}</p>
+              </>
+            )}
             <button
               style={{
                 backgroundColor: "black",

@@ -2,10 +2,18 @@ import React, { useState, useEffect, useCallback } from "react";
 import _ from "lodash"; // Import lodash for throttling
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
+
 import "leaflet/dist/leaflet.css";
 import "./UserDetails.css"; // Import the external CSS
 
 const UserDetails = () => {
+  delete L.Icon.Default.prototype._getIconUrl;
+  L.Icon.Default.mergeOptions({
+    iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+    iconRetinaUrl:
+      "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
+    shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
+  });
   const [coordinates, setCoordinates] = useState({
     lat: 40.7128,
     lng: -74.006,
