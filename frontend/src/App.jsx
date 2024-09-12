@@ -7,6 +7,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import OtherSections from "./Administration/Sections/OtherSections";
 import Allerts from "./NewAdmin/Allerts";
+import UserDetails from "./NewAdmin/UserDetails";
 function App() {
   return (
     <>
@@ -24,6 +25,7 @@ function App() {
       />
       <Routes>
         <Route path="/allalerts" element={<Allerts />} />
+        <Route path="/allalerts/one-alert" element={<UserDetails />} />
         <Route path="/" element={<Navbar />}>
           <Route path="/admin" element={<AdminNavbar />}>
             <Route path="all-alerts" element={<Allalerts />} />

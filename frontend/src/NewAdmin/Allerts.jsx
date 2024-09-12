@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import "./Allerts.css";
+import { useNavigate } from "react-router-dom";
 
 function Allerts() {
   const [selectedAlert, setSelectedAlert] = useState("");
   const [altertCategory, setaltertCategory] = useState("system");
+  const navigate = useNavigate();
   const alertsData = [
     {
       date: "Jan 24, 2024",
@@ -131,6 +133,9 @@ function Allerts() {
         {alertsData.map((alert, index) => (
           <div
             key={index}
+            onClick={() => {
+              navigate("/allalerts/one-alert");
+            }}
             style={{
               border: "1px solid #d1d5db",
               borderRadius: "8px",

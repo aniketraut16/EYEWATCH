@@ -1,0 +1,163 @@
+.user-details-container {
+  padding: 20px 10%;
+  font-family: Arial, sans-serif;
+}
+
+.user-info {
+  display: flex;
+
+  background-color: #f4f4f4;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.user-image {
+  border-radius: 5%;
+  width: 200px;
+  object-fit: contain;
+  margin-right: auto;
+}
+
+.user-data {
+  border-right: 2px solid black;
+  margin: 0px 10%;
+}
+.user-data,
+.emergency-contact {
+  flex: 1;
+  padding: 0 20px;
+}
+
+.incident-info {
+  margin-bottom: 20px;
+}
+
+.video-section,
+.audio-section,
+.call-history,
+.previous-incidents,
+.location-details,
+.battery-info,
+.additional-details {
+  margin-bottom: 20px;
+}
+.video-analysis h4 {
+  display: inline-block;
+}
+.video-analysis * {
+  margin: 1% 0px;
+}
+.video-section span {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 10%;
+}
+.video-placeholder {
+  background-color: #eee;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  color: #888;
+  align-items: center;
+}
+.map-placeholder {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.map-placeholder p {
+  width: fit-content;
+  background-color: #e9f4ff;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  border-radius: 10px;
+}
+.audio-section audio {
+  width: 100%;
+}
+
+.call-history table {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* .call-history table,
+th,
+td {
+  border: 1px solid #ccc;
+} */
+
+table tr {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 2fr 1fr;
+  padding: 10px;
+}
+table thead,
+table tbody {
+  width: 100%;
+  border-radius: 5px;
+  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.234);
+}
+
+.call-history th,
+td {
+  padding: 10px;
+  text-align: left;
+}
+
+.call-history button,
+.previous-incidents button {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: black;
+  border-radius: 2px;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.call-history button:hover,
+.previous-incidents button:hover {
+  background-color: #0056b3;
+}
+
+.previous-incidents ul {
+  list-style-type: none !important;
+  padding: 0;
+}
+
+.previous-incidents ul > div > span {
+  padding: 10px;
+  border-radius: 10px;
+  background-color: white;
+  margin-right: 10px;
+}
+.battery-info p {
+  margin: 10px;
+  background-color: hsla(140, 100%, 50%, 0.07);
+  padding: 20px 10px;
+  border-radius: 10px;
+}
+.battery-info p > span {
+  padding: 10px;
+  border-radius: 10px;
+  background-color: white;
+  margin-right: 10px;
+  margin-left: auto;
+}
+.previous-incidents ul > div {
+  margin: 10px;
+  background-color: #e9f4ff;
+  padding: 20px 10px;
+  border-radius: 10px;
+}
+.additional-details {
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+}
